@@ -1,14 +1,12 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"time"
 
-	"workspace/FictionGeminiRewritten/internal/ai"
 	"workspace/FictionGeminiRewritten/internal/handlers"
 	"workspace/FictionGeminiRewritten/internal/services"
 
@@ -25,22 +23,9 @@ func main() {
 		port = defaultPort
 	}
 
-	apiKey := os.Getenv("GEMINI_API_KEY")
-	if apiKey == "" {
-		log.Fatalf("GEMINI_API_KEY environment variable not set. The application cannot start.")
-	}
-
-	ctx := context.Background()
-
-	// Initialize AI Client (once)
-	geminiClient, err := ai.NewGeminiClient(ctx, apiKey)
-	if err != nil {
-		log.Fatalf("Failed to initialize Gemini AI client: %v", err)
-	}
-	defer geminiClient.Close() // Ensure client is closed when main exits
 
 	// Initialize Services
-	orchestratorSvc := services.NewOrchestratorService(geminiClient)
+	orchestratorSvc := services.NewOrchestratorService()
 
 	// Initialize Handlers
 	generateHandler := handlers.NewGenerateHandler(orchestratorSvc)

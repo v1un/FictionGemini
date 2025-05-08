@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
@@ -79,26 +78,9 @@ func (h *GenerateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Received /generate request. Log ID: %s, Series: '%s', Option: %s, Model: %s", 
 		logIdentifier, payload.Series, payload.Option, payload.Model)
 
-	// Set API key in context for Gemini client (if it were to be initialized per request or in orchestrator)
-	// However, our current NewGeminiClient takes it at startup. If API key can change per request,
-	// the orchestrator or AI service would need to handle it, or client re-initialized.
-	// For this version, we assume APIKey in payload is for validation/logging, and client uses env var.
-	// Let's simulate checking against an environment variable for the API key as the original did.
-	envAPIKey := os.Getenv("GEMINI_API_KEY")
-	if envAPIKey == "" {
-		log.Printf("GEMINI_API_KEY environment variable not set on server.")
-		// http.Error(w, "Server configuration error: AI API Key not set.", http.StatusInternalServerError) // User doesn't need to know this
-		// return
-		// For now, proceed, assuming orchestrator/AI client might have a built-in key for dev, or will fail there.
-	} else if payload.APIKey != envAPIKey {
-		log.Printf("Invalid API Key provided by user (Log ID: %s). Expected: %s...%s, Got: %s...%s", 
-			logIdentifier, envAPIKey[:3], envAPIKey[len(envAPIKey)-4:], payload.APIKey[:3], payload.APIKey[len(payload.APIKey)-4:])
-		http.Error(w, "Invalid API Key.", http.StatusUnauthorized)
-		return
-	}
 
 	ctx := r.Context() // Use request context
-	generatedJSON, messageLog, optionText, err := h.orchestrator.ProcessGenerationRequest(ctx, payload, logIdentifier)
+	generatedJSON, messageLog, optionText, err := h.orchestrator.ProcessGenerationRequest(ctx, payload, logIdentifier, payload.APIKey)
 
 	response := models.ResponsePayload{
 		Timestamp:    time.Now().Format(time.RFC3339),

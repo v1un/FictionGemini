@@ -458,7 +458,7 @@ func (s *OrchestratorService) generateTailoredUtilityCard(
 		WorldContextSummary: worldContextSummary,
 	}
 
-	actualPrompt, err := executeTemplate("tailoredToolCardPrompt", prompts.TailoredToolCardPrompt, promptData)
+	actualPrompt, err := executeTemplate("tailoredToolCardPrompt", prompts.ToolCardPromptTemplate, promptData)
 	if err != nil {
 		*currentMessages = append(*currentMessages, fmt.Sprintf("  ERROR preparing prompt for Tailored Utility Card '%s': %v\n", toolSuggestion.ToolName, err))
 		return "", err
