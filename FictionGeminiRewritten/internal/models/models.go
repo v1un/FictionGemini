@@ -71,7 +71,7 @@ type AISuggestedTool struct {
 }
 
 type RequestPayload struct {
-	APIKey          string `json:"apiKey"`
+	APIKey          string `json:"api_key"`
 	Series          string `json:"series"`
 	Option          string `json:"option"`
 	Model           string `json:"model"`
