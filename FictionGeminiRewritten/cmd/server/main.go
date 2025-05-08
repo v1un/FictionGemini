@@ -15,6 +15,26 @@ import (
 	// "google.golang.org/api/option"
 )
 
+
+// CORS Middleware
+func enableCORS(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Set headers
+		w.Header().Set("Access-Control-Allow-Origin", "*") // Allow any origin
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, API-Key")
+
+		// Handle preflight requests
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		// Next
+		next.ServeHTTP(w, r)
+	})
+}
+
 const defaultPort = "8080"
 
 func main() {
@@ -32,7 +52,7 @@ func main() {
 
 	// Setup Router
 	mux := http.NewServeMux()
-	mux.Handle("/generate", generateHandler)
+	mux.Handle("/generate", enableCORS(generateHandler)) // THIS LINE IS MODIFIED
 
 	// Root handler for basic check
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {

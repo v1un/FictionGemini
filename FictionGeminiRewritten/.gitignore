@@ -1,3 +1,6 @@
 /server
 /server.exe
 /*.exe
+
+backend.log
+jsons/
